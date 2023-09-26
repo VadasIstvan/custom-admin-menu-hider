@@ -1,12 +1,10 @@
 <?php
 /*
 Plugin Name: Custom Admin Menu Hider
-Description: Removes specific admin menu items for non-admin users.
+Description: Removes specific admin menu items for non-admin users and adds a custom dashboard widget.
 Version: 1.0
 Author: WhiteX
 */
-
-// Add this code to your theme's functions.php file or a custom plugin
 
 function remove_admin_menu_items()
 {
@@ -37,3 +35,29 @@ function remove_admin_menu_items()
 
 // Hook the function to the admin_menu action
 add_action('admin_menu', 'remove_admin_menu_items');
+
+// Function to add a custom dashboard widget
+function custom_dashboard_widget()
+{
+    echo '<div class="custom-dashboard-widget">';
+    echo '<h2 style="font-size: 24px;">Support</h2>';
+    echo '<p>Welcome to the CMS section of your website.</p>';
+    echo '<p>If you encounter any problems please reach out to <a href="mailto:contact@whitex.design">contact@whitex.design</a></p>';
+    echo '</div>';
+}
+
+// Hook to add the custom dashboard widget at the top
+function add_custom_dashboard_widgets()
+{
+    wp_add_dashboard_widget('custom_dashboard_widget', 'Custom Dashboard Widget', 'custom_dashboard_widget');
+
+    // Reorder the widgets to make the custom widget appear first
+    global $wp_meta_boxes;
+    $normal_dashboard = $wp_meta_boxes['dashboard']['normal']['core'];
+    $custom_widget = array('custom_dashboard_widget' => $normal_dashboard['custom_dashboard_widget']);
+    unset($normal_dashboard['custom_dashboard_widget']);
+    $sorted_dashboard = array_merge($custom_widget, $normal_dashboard);
+    $wp_meta_boxes['dashboard']['normal']['core'] = $sorted_dashboard;
+}
+
+add_action('wp_dashboard_setup', 'add_custom_dashboard_widgets');
